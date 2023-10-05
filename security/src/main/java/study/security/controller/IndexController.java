@@ -53,7 +53,6 @@ public class IndexController {
 
     @PostMapping("/join")
     public String join(User user) {
-        System.out.println("user = " + user);
         user.setRole("USER");
         String rawPassword = user.getPassword();
         String encPassword = bCryptPasswordEncoder.encode(rawPassword);

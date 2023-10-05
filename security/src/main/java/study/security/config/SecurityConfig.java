@@ -27,8 +27,11 @@ public class SecurityConfig {
                     .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
                     .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                     .anyRequest().permitAll() // 다른 요청들은 전부 허용
-            ).formLogin()
-            .loginPage("/loginForm");
+            )
+            .formLogin()
+            .loginPage("/loginForm")
+            .loginProcessingUrl("/login")// login 호출이 되면 낚아채서 대신 로그인 진행
+            .defaultSuccessUrl("/");
         return http.build();
     }
 }
