@@ -1,26 +1,52 @@
 package study.security.config.oauth;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import study.security.config.auth.PrincipalDetails;
+import study.security.model.User;
+import study.security.repository.UserRepository;
 
 @Service
 public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private UserRepository userRepository;
+
     // google oauth2 로그인 후 후처리하는곳
     // default controller route - /login/oauth2/code/google
+    // 함수 종료시 @AuthenticationPrincipal 어노테이션 만들어진다.
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        System.out.println("getClientRegistration = " + userRequest.getClientRegistration());
-        System.out.println("getAccessToken = " + userRequest.getAccessToken());
-        System.out.println("getAttributes = " + super.loadUser(userRequest).getAttributes());
-
+        // loadUser를 통해 값을 받은 AccessToken으로 구글로 요청을 보내 회원 프로필을 가져온다
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
+        String provider = userRequest.getClientRegistration().getClientId();
+        String providerId = oAuth2User.getAttribute("sub");
+        String username = provider + "_" + providerId;
+        String password = bCryptPasswordEncoder.encode(username);
+        String email = oAuth2User.getAttribute("email");
+        String role = "ROLE_USER";
 
-        // loadUser를 통해 값을 받은 AccessToken으로 구글로 요청을 보내 회원 프로필을 가져온다
-        return oAuth2User;
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            user = User.builder()
+                .username(username)
+                .password(password)
+                .email(email)
+                .role(role)
+                .provider(provider)
+                .providerId(providerId)
+                .build();
+            userRepository.save(user);
+        }
+        return new PrincipalDetails(user, oAuth2User.getAttributes());
     }
 }
