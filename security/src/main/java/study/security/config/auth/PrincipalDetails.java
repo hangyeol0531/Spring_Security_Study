@@ -1,19 +1,22 @@
 package study.security.config.auth;
 
 
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
-
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import study.security.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 // 로그인을 완료시 -> security session을 만들어 준다. (Security ContextHolder)
 // context -> Authentication 객체 -> Authentication 객체 안에 User 정보가 있어야함
 
 // Security Session => Authentication => PrincipalDetails(UserDetails)
-public class PrincipalDetails implements UserDetails {
+@Data
+public class PrincipalDetails implements UserDetails, OAuth2User {
 
     private User user;
 
@@ -62,5 +65,15 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }
