@@ -32,7 +32,14 @@ spring:
           google:
             client-id:
             client-secret:
-            redirect-uri: http://localhost:8080/login/auth2/code/google
+            redirect-url: http://localhost:8080/login/oauth2/code/google
             scope:
             - email
             - profile
+
+          facebook:
+            client-id:
+            client-secret:
+            scope:
+            - email
+            - public_profile
