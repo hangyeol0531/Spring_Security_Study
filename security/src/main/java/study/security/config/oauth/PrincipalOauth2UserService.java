@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 import study.security.config.auth.PrincipalDetails;
 import study.security.config.auth.provider.FacebookUserInfo;
 import study.security.config.auth.provider.GoogleUserInfo;
+import study.security.config.auth.provider.NaverUserInfo;
 import study.security.config.auth.provider.OAuth2UserInfo;
 import study.security.model.User;
 import study.security.repository.UserRepository;
+
+import java.util.Map;
 
 @Service
 public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
@@ -38,6 +41,8 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
             oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
         } else if (registrationId.equals("facebook")) {
             oAuth2UserInfo = new FacebookUserInfo(oAuth2User.getAttributes());
+        } else if (registrationId.equals("naver")) {
+            oAuth2UserInfo = new NaverUserInfo((Map) oAuth2User.getAttributes().get("response"));
         } else {
             System.out.println("exception");
         }
