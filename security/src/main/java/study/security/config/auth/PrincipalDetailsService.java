@@ -16,6 +16,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     private UserRepository userRepository;
 
     // 함수 종료시 @AuthenticationPrincipal 어노테이션 만들어진다.
+    // 최초 로그인시에만 실행되고 후 세션을 넘겨준다., 세션 스토리지에 저장 후 요청이 오면 스토리지 값을 넘겨줌
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
