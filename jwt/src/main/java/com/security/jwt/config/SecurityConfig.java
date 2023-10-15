@@ -1,6 +1,6 @@
 package com.security.jwt.config;
 
-import com.security.jwt.filter.MyFilter1;
+import com.security.jwt.JwtAuthenticationFilter;
 import com.security.jwt.filter.MyFilter3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 @Configuration
@@ -27,7 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(CsrfConfigurer::disable);
         http
-            .addFilterBefore(new MyFilter3(), SecurityContextPersistenceFilter.class)
+//            .addFilterBefore(new MyFilter3(), SecurityContextPersistenceFilter.class)
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 세션 사용 X
             .and()
             .apply(new MyCustomDsl())
@@ -49,9 +48,12 @@ public class SecurityConfig {
 
     public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurity> {
         @Override
-        public void configure(HttpSecurity http) throws Exception {
+        public void configure(HttpSecurity http) {
+            AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+
             http
-                .addFilter(corsConfig.corsFilter());
+                .addFilter(corsConfig.corsFilter())
+                .addFilter(new JwtAuthenticationFilter(authenticationManager)); // authentication Manger
         }
     }
 }
