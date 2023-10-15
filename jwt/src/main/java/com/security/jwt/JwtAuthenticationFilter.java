@@ -1,5 +1,7 @@
 package com.security.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.auth.PrincipalDetails;
 import com.security.jwt.model.User;
@@ -15,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Date;
 
 // spring security UsernamePasswordAuthenticationFilter
 
@@ -54,6 +57,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // attemptAuthentication 실행 후 인증이 정상적으로 되었다면 successfulAuthentication 함수 실행
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        super.successfulAuthentication(request, response, chain, authResult);
+
+        PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
+
+        String jwtToken = JWT.create()
+            .withSubject(principalDetails.getUsername())
+            .withExpiresAt(new Date(System.currentTimeMillis() + (60000 * 10)))
+            .withClaim("id", principalDetails.getUser().getId())
+            .withClaim("username", principalDetails.getUser().getUsername())
+            .sign(Algorithm.HMAC512("cos"));
+
+        response.addHeader("Authorization", "Bearer " + jwtToken);
     }
 }
