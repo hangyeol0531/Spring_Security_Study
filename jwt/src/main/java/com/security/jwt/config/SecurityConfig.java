@@ -1,7 +1,9 @@
 package com.security.jwt.config;
 
 import com.security.jwt.JwtAuthenticationFilter;
+import com.security.jwt.JwtAuthorizationFilter;
 import com.security.jwt.filter.MyFilter3;
+import com.security.jwt.model.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,7 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
 public class SecurityConfig {
 
     private final CorsConfig corsConfig;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,7 +39,7 @@ public class SecurityConfig {
             .authorizeRequests(authorize ->
                 authorize
                     .requestMatchers("/api/v1/user/**")
-                    .access("hasRole('ROLE_USRR') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+                    .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                     .requestMatchers("/api/v1/manager/**")
                     .access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                     .requestMatchers("/api/v1/admin/**")
@@ -53,7 +56,8 @@ public class SecurityConfig {
 
             http
                 .addFilter(corsConfig.corsFilter())
-                .addFilter(new JwtAuthenticationFilter(authenticationManager)); // authentication Manger
+                .addFilter(new JwtAuthenticationFilter(authenticationManager)) // authentication Manger
+                .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository));
         }
     }
 }

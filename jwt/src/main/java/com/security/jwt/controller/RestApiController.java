@@ -34,4 +34,18 @@ public class RestApiController {
         return "join success";
     }
 
+    @GetMapping("/api/v1/user")
+    public String user(){
+        return "<h1>user</h1>";
+    }
+
+    @GetMapping("/api/v1/manager")
+    public String manager(){
+        return "<h1>manager</h1>";
+    }
+
+    @GetMapping("/api/v1/admin")
+    public String admin(){
+        return "<h1>admin</h1>";
+    }
 }
